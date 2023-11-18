@@ -3,7 +3,7 @@ import { io } from "socket.io-client";
 import logo from "./images/iologo.png";
 import "./App.css";
 
-const webScocket = io("http://localhost:5000");
+const webSocket = io("http://localhost:5000");
 
 const App = () => {
     const messagesEndRef = useRef(null);
@@ -13,7 +13,7 @@ const App = () => {
     const [msgList, setMsgList] = useState([]);
 
     useEffect(() => {
-        if (!webScocket) return;
+        if (!webSocket) return;
         const sMessageCallback = (msg) => {
             const { data, id } = msg;
             setMsgList((prev) => [
@@ -25,14 +25,14 @@ const App = () => {
                 },
             ]);
         };
-        webScocket.on("sMessage", sMessageCallback);
+        webSocket.on("sMessage", sMessageCallback);
         return () => {
-            webScocket.off("sMessage", sMessageCallback);
+            webSocket.off("sMessage", sMessageCallback);
         };
     }, []);
 
     useEffect(() => {
-        if (!webScocket) return;
+        if (!webSocket) return;
         const sLoginCallback = (msg) => {
             setMsgList((prev) => [
                 ...prev,
@@ -43,9 +43,9 @@ const App = () => {
                 },
             ]);
         };
-        webScocket.on("sLogin", sLoginCallback);
+        webSocket.on("sLogin", sLoginCallback);
         return () => {
-            webScocket.off("sLogin", sLoginCallback);
+            webSocket.off("sLogin", sLoginCallback);
         };
     }, []);
 
@@ -59,7 +59,7 @@ const App = () => {
 
     const onSubmitHandler = (e) => {
         e.preventDefault();
-        webScocket.emit("login", userId);
+        webSocket.emit("login", userId);
         setIsLogin(true);
     };
 
@@ -73,7 +73,7 @@ const App = () => {
             data: msg,
             id: userId,
         };
-        webScocket.emit("message", sendData);
+        webSocket.emit("message", sendData);
         setMsgList((prev) => [...prev, { msg: msg, type: "me", id: userId }]);
         setMsg("");
     };
