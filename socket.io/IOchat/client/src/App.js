@@ -11,16 +11,17 @@ const App = () => {
     const [isLogin, setIsLogin] = useState(false);
     const [msg, setMsg] = useState("");
     const [msgList, setMsgList] = useState([]);
+    const [privateTarget, setPrivateTarget] = useState("");
 
     useEffect(() => {
         if (!webSocket) return;
         const sMessageCallback = (msg) => {
-            const { data, id } = msg;
+            const { data, id, target } = msg;
             setMsgList((prev) => [
                 ...prev,
                 {
                     msg: data,
-                    type: "other",
+                    type: target ? "private" : "other",
                     id: id,
                 },
             ]);
@@ -72,6 +73,7 @@ const App = () => {
         const sendData = {
             data: msg,
             id: userId,
+            target: privateTarget,
         };
         webSocket.emit("message", sendData);
         setMsgList((prev) => [...prev, { msg: msg, type: "me", id: userId }]);
@@ -80,6 +82,11 @@ const App = () => {
 
     const onChangeMsgHandler = (e) => {
         setMsg(e.target.value);
+    };
+
+    const onSetPrivateTarget = (e) => {
+        const { id } = e.target.dataset;
+        setPrivateTarget((prev) => (prev === id ? "" : id));
     };
 
     return (
@@ -97,9 +104,31 @@ const App = () => {
                                         <div className="line"></div>
                                     </li>
                                 ) : (
-                                    <li className={v.type} key={`${i}_li`}>
-                                        <div className="userId">{v.id}</div>
-                                        <div className={v.type}>{v.msg}</div>
+                                    <li
+                                        className={v.type}
+                                        key={`${i}_li`}
+                                        name={v.id}
+                                        data-id={v.id}
+                                        onClick={onSetPrivateTarget}
+                                    >
+                                        <div
+                                            className={
+                                                v.id === privateTarget
+                                                    ? "private-user"
+                                                    : "userId"
+                                            }
+                                            data-id={v.id}
+                                            name={v.id}
+                                        >
+                                            {v.id}
+                                        </div>
+                                        <div
+                                            className={v.type}
+                                            data-id={v.id}
+                                            name={v.id}
+                                        >
+                                            {v.msg}
+                                        </div>
                                     </li>
                                 )
                             )}
@@ -109,6 +138,11 @@ const App = () => {
                             className="send-form"
                             onSubmit={onSendSubmitHandler}
                         >
+                            {privateTarget && (
+                                <div className="private-target">
+                                    {privateTarget}
+                                </div>
+                            )}
                             <input
                                 placeholder="Enter your message"
                                 onChange={onChangeMsgHandler}
