@@ -1,5 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { io } from "socket.io-client";
+import logo from "./images/iologo.png";
+import "./App.css";
 
 const webScocket = io("http://localhost:5000");
 
@@ -32,7 +34,6 @@ const App = () => {
     useEffect(() => {
         if (!webScocket) return;
         const sLoginCallback = (msg) => {
-            const { data, id } = msg;
             setMsgList((prev) => [
                 ...prev,
                 {
@@ -128,7 +129,12 @@ const App = () => {
                             <div>IOChat</div>
                         </div>
                         <form className="login-form" onSubmit={onSubmitHandler}>
-                            <input></input>
+                            <input
+                                placeholder="Enter your ID"
+                                onChange={onChangeUserIdHandler}
+                                value={userId}
+                            />
+                            <button type="submit">Login</button>
                         </form>
                     </div>
                 )}
