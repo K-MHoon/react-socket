@@ -32,14 +32,24 @@ io.sockets.on("connection", (socket) => {
     console.log("user connected");
     socket.on("message", (res) => {
         const { target } = res;
-        const toUser = clients.get(target);
-        target
-            ? io.sockets.to(toUser).emit("sMessage", res)
-            : socket.broadcast.emit("sMessage", res);
+        if (target) {
+            const toUser = clients.get(target);
+            io.sockets.to(toUser).emit("sMessage", res);
+            return;
+        }
+        const myRooms = Array.from(socket.rooms);
+        if (myRooms.length > 1) {
+            socket.broadcast.in(myRooms[1]).emit("sMessage", res);
+            return;
+        }
+        socket.broadcast.emit("sMessage", res);
     });
     socket.on("login", (data) => {
-        clients.set(data, socket.id);
-        socket.broadcast.emit("sLogin", data);
+        const { userId, roomNumber } = data;
+
+        socket.join(roomNumber);
+        clients.set(userId, socket.id);
+        socket.broadcast.emit("sLogin", userId);
     });
     socket.on("disconnect", () => {
         console.log("user disconnected");
