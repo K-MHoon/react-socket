@@ -33,12 +33,13 @@ io.use((socket, next) => {
 });
 
 io.on("connection", (socket) => {
-    addNewUser(socket.userName, socket.io);
+    addNewUser(socket.userName, socket.id);
     socket.on("userList", () => {
         io.sockets.emit("user-list", users);
     });
     socket.on("sendNotification", ({ senderName, receiverName, type }) => {
         const receiver = getUser(receiverName);
+        console.log(receiver);
         io.to(receiver.socketId).emit("getNotification", {
             senderName,
             type,
