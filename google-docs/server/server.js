@@ -1,8 +1,7 @@
 const mongoose = require("mongoose");
 const Document = require("./Schema");
 
-const uri =
-    "mongodb+srv://google-docs:1111@cluster0.6suahnm.mongodb.net/?retryWrites=true&w=majority";
+const uri = "mongodb://127.0.0.1:27017";
 
 mongoose.set("strictQuery", false);
 mongoose
@@ -21,10 +20,10 @@ const userMap = new Map();
 io.on("connection", (socket) => {
     let _documentId = "";
 
-    socket.on("join", async (docuemntId) => {
+    socket.on("join", async (documentId) => {
         _documentId = documentId;
         const document = await findOrCreateDocument(documentId);
-        socket.join(docuemntId);
+        socket.join(documentId);
         socket.emit("initDocument", {
             _document: document.data,
             userList: userMap.get(documentId) || [],
@@ -57,7 +56,7 @@ io.on("connection", (socket) => {
 const setUserMap = (documentId, myId) => {
     const tempUserList = userMap.get(documentId);
     if (!tempUserList) {
-        userMap.set(docuemntId, [myId]);
+        userMap.set(documentId, [myId]);
     } else {
         userMap.set(documentId, [...tempUserList, myId]);
     }
@@ -68,5 +67,5 @@ const findOrCreateDocument = async (id) => {
 
     const document = await Document.findById(id);
     if (document) return document;
-    return await Document.create({ _id: id, data: defaultValue });
+    return await Document.create({ _id: id, data: "" });
 };
