@@ -1,21 +1,25 @@
-function App() {
+import React from "react";
+import {
+    BrowserRouter as Router,
+    Routes,
+    Route,
+    Navigate,
+} from "react-router-dom";
+import { v4 as uuidV4 } from "uuid";
+import EditorContainer from "./containers/editorContainer/EditorContainer";
+
+const App = () => {
     return (
-        <div className="App">
-            <header className="App-header">
-                <p>
-                    Edit <code>src/App.js</code> and save to reload.
-                </p>
-                <a
-                    className="App-link"
-                    href="https://reactjs.org"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    Learn React
-                </a>
-            </header>
-        </div>
+        <Router>
+            <Routes>
+                <Route
+                    path="/"
+                    element={<Navigate replace to={`/documents/${uuidV4()}`} />}
+                />
+                <Route path="/documents/:id" element={<EditorContainer />} />
+            </Routes>
+        </Router>
     );
-}
+};
 
 export default App;
