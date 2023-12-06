@@ -18,9 +18,9 @@ const privateMsg = (io) => {
             const userId = targetId[0];
             const privateRoom = await getRoomNumber(userId, socket.userId);
             if (!privateRoom) return;
-            const msgList = await privateMsg
-                .find({ rootNumber: privateRoom._id })
-                .exec();
+            const msgList = await PrivateMsg.find({
+                roomNumber: privateRoom._id,
+            }).exec();
             io.of("/private")
                 .to(privateRoom._id)
                 .emit("private-msg-init", { msg: msgList });
@@ -90,7 +90,7 @@ const createMsgDocument = async (roomNumber, res) => {
         roomNumber: roomNumber,
         msg: res.msg,
         toUserId: res.toUserId,
-        fromUserId: fromUserId,
+        fromUserId: res.fromUserId,
         time: res.time,
     });
 };
